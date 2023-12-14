@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from .models import Post
 
 posts = [
     {
@@ -18,9 +19,12 @@ posts = [
 
 def home(request):
     context = {
-        'posts': posts
+        'posts': Post.objects.all()
     }
     return render(request, 'Space4Wheels/home.html', context)
+
+def search(request):
+    return render(request, 'Space4Wheels/search.html', {'title': 'Search'})
 
 def about(request):
     return render(request, 'Space4Wheels/about.html', {'title': 'About'})
