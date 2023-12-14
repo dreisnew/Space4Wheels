@@ -17,6 +17,8 @@
     {% else %}
         <title>Space4Wheels</title>
     {% endif %}
+
+    <link rel="icon" href="https://www.clker.com/cliparts/P/T/L/u/k/0/orange-cog-wheel-hi.png">
 </head>
 <body>
     <header class="site-header">
@@ -29,6 +31,7 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{% url 'Space4Wheels-home' %}">Home</a>
+              <a class="nav-item nav-link" href="{% url 'Space4Wheels-search' %}">Search</a>
               <a class="nav-item nav-link" href="{% url 'Space4Wheels-about' %}">About</a>
             </div>
             <!-- Navbar Right Side -->
