@@ -1,0 +1,17 @@
+{% extends "Space4Wheels/base.html" %}
+{% block content %}
+    <h1>Search Page</h1>
+    <p>This page is for where users can search for possible rentals based on</p>
+    <ul>
+        <li>Date</li>
+        <li>location</li>
+    </ul>
+    <br />
+    <div class="">
+        <form action="{% url 'search_results' %}" method="get">
+            {% csrf_token %}
+            <input type="text" name="q" placeholder="Search Listing">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+{% endblock content %}

@@ -1,0 +1,21 @@
+{% extends "Space4Wheels/base.html" %}
+{% block content %}
+    <h2>Bookings Page</h2>
+    <p>
+        This page will have two tabs. Host and Renter:
+    </p>
+    <h4>Renter</h4>
+    <ul>
+        <li>display 'no bookings' if there are none</li>
+        <li>all bookings you reserved (and have done)</li>
+        <li>status of the booking you made: pending, rejected, approved, done?(for when you finished your rental)</li>
+    </ul>
+    <h4>Host</h4>
+    <ul>
+        <li>display 'no bookings' if there are none</li>
+        <li>all bookings that a renter requested for reservation (just for the specific host)</li>
+        <li>Buttons to approve, or reject</li>
+    </ul>
+{% endblock content %}
+
+<!-- To be displayed here: All your listings, and a create new listing button -->
