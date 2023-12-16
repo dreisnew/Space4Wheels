@@ -17,7 +17,7 @@
                 <h3>Renter Bookings</h3>
                 <ul>
                     {% for booking in renter_bookings %}
-                        <li>{{ booking.id }} - Status: {{ booking.status }}</li>
+                        <li>{{ booking.post }} - Status: {{ booking.status }}</li>
                         <!-- Add other booking details -->
                     {% endfor %}
                 </ul>
@@ -31,7 +31,7 @@
                 <h3>Host Bookings</h3>
                 <ul>
                     {% for booking in host_bookings %}
-                        <li>{{ booking.id }} - Status: {{ booking.status }}</li>
+                        <li>{{ booking.post }} - Status: {{ booking.status }}</li>
                         <!-- Add other booking details -->
                     {% endfor %}
                 </ul>

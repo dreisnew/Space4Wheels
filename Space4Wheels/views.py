@@ -9,6 +9,10 @@ from django.views.generic import (
 )
 from Space4Wheels.models import Post, Booking
 from .forms import BookingForm
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.generic.base import TemplateView
+
 
 def book_space(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
@@ -21,11 +25,18 @@ def book_space(request, post_id):
             booking.renter = request.user
             booking.host = post.author
             booking.save()
-            return redirect('booking-success')  # Redirect to a success page or any other page
+
+            # Add a success message
+            messages.success(request, 'Booking created successfully.')
+
+            return JsonResponse({'success': True})
+        else:
+            # Return a JSON response with form errors
+            return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     else:
         form = BookingForm()
 
-    return render(request, 'Space4Wheels/book_space.html', {'form': form, 'post': post})
+    return render(request, 'Space4Wheels/bookings.html', {'form': form, 'post': post})
 
 def home(request):
     context = {
@@ -33,11 +44,21 @@ def home(request):
     }
     return render(request, 'Space4Wheels/home.html', context)
 
-def bookings(request):
-    renter_bookings = Booking.objects.filter(renter=request.user)
-    host_bookings = Booking.objects.filter(host=request.user)
+class BookingsView(LoginRequiredMixin, TemplateView):
+    template_name = 'Space4Wheels/bookings.html'
 
-    return render(request, 'Space4Wheels/bookings.html', {'renter_bookings': renter_bookings, 'host_bookings': host_bookings})
+    def get_context_data(self, **kwargs):
+        # Your logic to retrieve bookings goes here
+        print("Current user:", self.request.user)
+        renter_bookings = Booking.objects.filter(renter=self.request.user)
+        host_bookings = Booking.objects.filter(host=self.request.user)
+
+        context = {
+            'renter_bookings': renter_bookings,
+            'host_bookings': host_bookings,
+        }
+
+        return context
 
 class UserParkingSpaceListView(LoginRequiredMixin, ListView):
     model = Post
@@ -63,9 +84,9 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        post = self.get_object()
-        booking_form = BookingForm()  # Assuming you have a BookingForm in your forms.py
-
+        # Set initial values for the non-editable fields
+        booking_form = BookingForm()
+        booking_form.set_initial_values(self.object, self.request.user, self.object.author)
         context['booking_form'] = booking_form
         return context
     

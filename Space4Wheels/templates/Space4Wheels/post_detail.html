@@ -42,23 +42,81 @@
     </article>
 
     <!-- Booking Modal -->
-    <div class="modal fade" id="bookNowModal" tabindex="-1" role="dialog" aria-labelledby="bookNowModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="bookNowModalLabel">Book Now</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form method="POST" class="form">
-                        {% csrf_token %}
-                        {{ booking_form|crispy }}
-                        <button type="submit" class="btn btn-primary">Submit Booking</button>
-                    </form>
-                </div>
+<div class="modal fade" id="bookNowModal" tabindex="-1" role="dialog" aria-labelledby="bookNowModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookNowModalLabel">Book Now</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" class="form" id="bookNowForm">
+                    {% csrf_token %}
+                    <!-- Manually format label and value for display -->
+                    <div class="form-group">
+                        <label>Renter:</label>
+                        {{ booking_form.renter.value }}
+                    </div>
+                    <div class="form-group">
+                        <label>Host:</label>
+                        {{ booking_form.host.value }}
+                    </div>
+                    <div class="form-group">
+                        <label>Post Title:</label>
+                        {{ booking_form.post.value }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ booking_form.reservation_start_date.id_for_label }}">Reservation Start Date:</label>
+                        {{ booking_form.reservation_start_date }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ booking_form.reservation_end_date.id_for_label }}">Reservation End Date:</label>
+                        {{ booking_form.reservation_end_date }}
+                    </div>
+                    <div class="form-group">
+                        <label>Status:</label>
+                        {{ booking_form.status }}
+                    </div>
+                    <!-- Add other fields as needed -->
+                    <button type="submit" class="btn btn-primary">Submit Booking</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
+<script>
+    // Handle form submission using AJAX
+document.getElementById('bookNowForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Perform an AJAX request to the book_space view
+    fetch('{% url "book-space" post_id=post.id %}', {
+        method: 'POST',
+        body: new FormData(event.target),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Display a success message
+            alert('Booking created successfully!');
+
+            // Reload the page to show the updated status
+            location.reload();
+        } else {
+            // Log the error details to the console
+            console.error('Failed to create booking:', data.errors);
+
+            // Display an error message to the user
+            alert('Failed to create booking. Please check the form for errors.');
+        }
+    })
+    .catch(error => {
+        // Handle fetch error if needed
+        console.error('Error:', error);
+    });
+});
+
+</script>
 {% endblock content %}
