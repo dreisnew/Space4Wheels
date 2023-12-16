@@ -17,6 +17,17 @@ def home(request):
     }
     return render(request, 'Space4Wheels/home.html', context)
 
+class UserParkingSpaceListView(LoginRequiredMixin, ListView):
+    model = Post
+    template_name = 'Space4Wheels/host.html'
+    context_object_name = 'user_listings'
+    ordering = ['-date_posted']
+    paginate_by = 5
+
+    def get_queryset(self):
+        # Filter posts where the current user is the author
+        return Post.objects.filter(author=self.request.user)
+    
 class PostListView(ListView):
     model = Post
     template_name = 'Space4Wheels/home.html' # app>/<model>_<viewtype.html>
@@ -64,7 +75,11 @@ def search(request):
     return render(request, 'Space4Wheels/search.html', {'title': 'Search'})
 
 def host(request):
-    return render(request, 'Space4Wheels/host.html', {'title': 'Host'})
+    # Use the as_view method to instantiate the class-based view and handle the request
+    user_listings_view = UserParkingSpaceListView.as_view()
+    return user_listings_view(request)
+    
+    return render(request, 'Space4Wheels/host.html', {'title': 'Host', 'user_listings': user_listings})
 
 def bookings(request):
     return render(request, 'Space4Wheels/bookings.html', {'title': 'Bookings'})
