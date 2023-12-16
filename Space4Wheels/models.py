@@ -51,6 +51,7 @@ class Booking(models.Model):
     reservation_start_date = models.DateTimeField()
     reservation_end_date = models.DateTimeField()
     date_requested = models.DateTimeField(default=timezone.now)
+    pending_approval = models.BooleanField(default=True)
     
     def __str__(self):
         return f'{self.renter.username} - {self.post.title}'

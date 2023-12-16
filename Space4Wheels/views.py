@@ -48,17 +48,32 @@ class BookingsView(LoginRequiredMixin, TemplateView):
     template_name = 'Space4Wheels/bookings.html'
 
     def get_context_data(self, **kwargs):
-        # Your logic to retrieve bookings goes here
-        print("Current user:", self.request.user)
         renter_bookings = Booking.objects.filter(renter=self.request.user)
-        host_bookings = Booking.objects.filter(host=self.request.user)
+        host_bookings_pending_approval = Booking.objects.filter(host=self.request.user, pending_approval=True)
+        host_bookings_approved = Booking.objects.filter(host=self.request.user, pending_approval=False)
 
         context = {
             'renter_bookings': renter_bookings,
-            'host_bookings': host_bookings,
+            'host_bookings_pending_approval': host_bookings_pending_approval,
+            'host_bookings_approved': host_bookings_approved,
         }
-
         return context
+    
+def approve_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    # Perform approval logic, e.g., set status to 'approved'
+    booking.status = 'approved'
+    booking.pending_approval = False
+    booking.save()
+    return redirect('bookings')  # Redirect to the bookings page
+
+def reject_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    # Perform rejection logic, e.g., set status to 'rejected'
+    booking.status = 'rejected'
+    booking.pending_approval = False
+    booking.save()
+    return redirect('bookings') 
 
 class UserParkingSpaceListView(LoginRequiredMixin, ListView):
     model = Post

@@ -31,8 +31,11 @@
                 <h3>Host Bookings</h3>
                 <ul>
                     {% for booking in host_bookings %}
-                        <li>{{ booking.post }} - Status: {{ booking.status }}</li>
-                        <!-- Add other booking details -->
+                    <li>
+                        {{ booking.post.title }} - Status: {{ booking.status }}
+                        <a href="{% url 'approve-booking' booking.id %}">Approve</a>
+                        <a href="{% url 'reject-booking' booking.id %}">Reject</a>
+                    </li>
                     {% endfor %}
                 </ul>
                 <!-- Add buttons to approve or reject bookings -->
