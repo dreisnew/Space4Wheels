@@ -1,3 +1,5 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
@@ -59,6 +61,16 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             return True
         return False
 
+class ListingSearchView(ListView):
+    model = Post
+    template_name = 'Space4Wheels/searchresults.html' # app>/<model>_<viewtype.html>
+    context_object_name = 'posts'
+    ordering = ['-date_posted']
+    paginate_by = 5
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        return Post.objects.filter(title=query).order_by('-date_posted')
 
 def search(request):
     return render(request, 'Space4Wheels/search.html', {'title': 'Search'})
