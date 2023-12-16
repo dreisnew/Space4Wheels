@@ -1,21 +1,44 @@
+<!-- bookings.html -->
 {% extends "Space4Wheels/base.html" %}
 {% block content %}
     <h2>Bookings Page</h2>
-    <p>
-        This page will have two tabs. Host and Renter:
-    </p>
-    <h4>Renter</h4>
-    <ul>
-        <li>display 'no bookings' if there are none</li>
-        <li>all bookings you reserved (and have done)</li>
-        <li>status of the booking you made: pending, rejected, approved, done?(for when you finished your rental)</li>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="renter-tab" data-toggle="tab" href="#renter">Renter</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="host-tab" data-toggle="tab" href="#host">Host</a>
+        </li>
     </ul>
-    <h4>Host</h4>
-    <ul>
-        <li>display 'no bookings' if there are none</li>
-        <li>all bookings that a renter requested for reservation (just for the specific host)</li>
-        <li>Buttons to approve, or reject</li>
-    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="renter">
+            {% if renter_bookings %}
+                <!-- Display renter bookings -->
+                <h3>Renter Bookings</h3>
+                <ul>
+                    {% for booking in renter_bookings %}
+                        <li>{{ booking.id }} - Status: {{ booking.status }}</li>
+                        <!-- Add other booking details -->
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No bookings as a renter.</p>
+            {% endif %}
+        </div>
+        <div class="tab-pane fade" id="host">
+            {% if host_bookings %}
+                <!-- Display host bookings -->
+                <h3>Host Bookings</h3>
+                <ul>
+                    {% for booking in host_bookings %}
+                        <li>{{ booking.id }} - Status: {{ booking.status }}</li>
+                        <!-- Add other booking details -->
+                    {% endfor %}
+                </ul>
+                <!-- Add buttons to approve or reject bookings -->
+            {% else %}
+                <p>No bookings as a host.</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock content %}
-
-<!-- To be displayed here: All your listings, and a create new listing button -->

@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import (
     ListView, 
@@ -7,15 +7,37 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from .models import Post
+from Space4Wheels.models import Post, Booking
+from .forms import BookingForm
 
+def book_space(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
 
+    if request.method == 'POST':
+        form = BookingForm(request.POST)
+        if form.is_valid():
+            booking = form.save(commit=False)
+            booking.post = post
+            booking.renter = request.user
+            booking.host = post.author
+            booking.save()
+            return redirect('booking-success')  # Redirect to a success page or any other page
+    else:
+        form = BookingForm()
+
+    return render(request, 'Space4Wheels/book_space.html', {'form': form, 'post': post})
 
 def home(request):
     context = {
         'posts': Post.objects.all()
     }
     return render(request, 'Space4Wheels/home.html', context)
+
+def bookings(request):
+    renter_bookings = Booking.objects.filter(renter=request.user)
+    host_bookings = Booking.objects.filter(host=request.user)
+
+    return render(request, 'Space4Wheels/bookings.html', {'renter_bookings': renter_bookings, 'host_bookings': host_bookings})
 
 class UserParkingSpaceListView(LoginRequiredMixin, ListView):
     model = Post
@@ -37,6 +59,15 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
+    template_name = 'Space4Wheels/post_detail.html'  # Update with your actual template name
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        booking_form = BookingForm()  # Assuming you have a BookingForm in your forms.py
+
+        context['booking_form'] = booking_form
+        return context
     
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post

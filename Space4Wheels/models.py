@@ -35,8 +35,27 @@ class Post(models.Model):
     date_updated = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
+
+class Booking(models.Model):
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('done', 'Done'),
+    ]
+    
+    post = models.ForeignKey('Post', on_delete=models.CASCADE)
+    renter = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings_made')
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bookings_received')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    reservation_start_date = models.DateTimeField()
+    reservation_end_date = models.DateTimeField()
+    date_requested = models.DateTimeField(default=timezone.now)
+    
     def __str__(self):
-        return self.title
+        return f'{self.renter.username} - {self.post.title}'
     
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
+    
+    
