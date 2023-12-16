@@ -20,7 +20,7 @@ def home(request):
 class UserParkingSpaceListView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'Space4Wheels/host.html'
-    context_object_name = 'user_listings'
+    context_object_name = 'user_listings'  # Rename 'posts' to 'user_listings'
     ordering = ['-date_posted']
     paginate_by = 5
 
@@ -40,7 +40,11 @@ class PostDetailView(DetailView):
     
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
-    fields = ['title', 'content'] # add the fields you want for the user to add/edit
+    fields = [
+        'title', 'content', 'country', 'city', 'address', 'price',
+        'price_rate', 'car_space_pics', 'car_space_type', 'map_image',
+        'additional_notes', 'status'
+    ]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -48,7 +52,11 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    fields = ['title', 'content'] # add the fields you want for the user to add/edit
+    fields = [
+        'title', 'content', 'country', 'city', 'address', 'price',
+        'price_rate', 'car_space_pics', 'car_space_type', 'map_image',
+        'additional_notes', 'status'
+    ]
 
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -75,9 +83,10 @@ def search(request):
     return render(request, 'Space4Wheels/search.html', {'title': 'Search'})
 
 def host(request):
-    # Use the as_view method to instantiate the class-based view and handle the request
-    user_listings_view = UserParkingSpaceListView.as_view()
-    return user_listings_view(request)
+    # Instantiate the class-based view and get the queryset
+    user_listings_view = UserParkingSpaceListView()
+    user_listings_view.request = request
+    user_listings = user_listings_view.get_queryset()
     
     return render(request, 'Space4Wheels/host.html', {'title': 'Host', 'user_listings': user_listings})
 

@@ -3,13 +3,35 @@
     <article class="media content-section">
         <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
         <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="#">{{ object.author }}</a>
-            <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
-        </div>
-        <h2 class="article-title">{{ object.title }}</h2>
-        <p class="article-content">{{ object.content }}</p>
-        <!-- Add the other attributes/content to be displayed -->
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ object.author }}</a>
+                <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+            </div>
+            <h2 class="article-title">{{ object.title }}</h2>
+            <p class="article-content">{{ object.content }}</p>
+            
+            <!-- Add the other attributes/content -->
+            <p><strong>Country:</strong> {{ object.country }}</p>
+            <p><strong>City:</strong> {{ object.city }}</p>
+            <p><strong>Address:</strong> {{ object.address }}</p>
+            <p><strong>Price:</strong> {{ object.price }}</p>
+            <p><strong>Price Rate:</strong> {{ object.get_price_rate_display }}</p>
+            <img src="{{ object.car_space_pics.url }}" alt="Car Space Pics" style="max-width: 300px;">
+            <p><strong>Car Space Type:</strong> {{ object.get_car_space_type_display }}</p>
+            <p><strong>Map Image:</strong> {{ object.map_image|safe }}</p>
+            
+            {% if object.additional_notes %}
+                <p><strong>Additional Notes:</strong> {{ object.additional_notes }}</p>
+            {% endif %}
+            
+            <p><strong>Status:</strong> {{ object.status }}</p>
+            
+            <!-- Add more fields as needed -->
+            
+            {% if user.is_authenticated and user == object.author %}
+                <a href="{% url 'post-update' pk=object.pk %}" class="btn btn-secondary">Update</a>
+                <a href="{% url 'post-delete' pk=object.pk %}" class="btn btn-danger">Delete</a>
+            {% endif %}
         </div>
     </article>
 {% endblock content %}
