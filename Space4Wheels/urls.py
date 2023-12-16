@@ -5,7 +5,8 @@ from .views import (
     PostDetailView, 
     PostCreateView, 
     PostUpdateView,
-    PostDeleteView
+    PostDeleteView,
+    ListingSearchView,
 )
 #from users import views as user_views
 
@@ -16,6 +17,7 @@ urlpatterns = [
     path('post/<int:pk>/update/', PostUpdateView.as_view(), name='post-update'),
     path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete'),
     path('search/', views.search, name='Space4Wheels-search'),
+    path('search/results/', views.ListingSearchView.as_view(), name='search_results'),
     path('host/', views.host, name='Space4Wheels-host'),
     path('bookings/', views.bookings, name='Space4Wheels-bookings'),
     path('about/', views.about, name='Space4Wheels-about'),
