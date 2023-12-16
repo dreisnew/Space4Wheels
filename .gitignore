@@ -1,2 +1,6 @@
 
+*.sqlite3
+*.pyc
+__pycache__/
+# Ignore db.sqlite3 file
 db.sqlite3
