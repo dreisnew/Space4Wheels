@@ -17,8 +17,9 @@
                 <h3>Renter Bookings</h3>
                 <ul>
                     {% for booking in renter_bookings %}
-                        <li>{{ booking.post }} - Status: {{ booking.status }}</li>
-                        <!-- Add other booking details -->
+                        <li>{{ booking.post.title }} - Status: {{ booking.status }}</li>
+                        {{booking.reservation_start_date}} to
+                        {{booking.reservation_end_date}}
                     {% endfor %}
                 </ul>
             {% else %}
@@ -26,20 +27,31 @@
             {% endif %}
         </div>
         <div class="tab-pane fade" id="host">
-            {% if host_bookings %}
-                <!-- Display host bookings -->
-                <h3>Host Bookings</h3>
+            {% if host_bookings_pending_approval %}
+                <h3>Host Bookings (Pending Approval)</h3>
                 <ul>
-                    {% for booking in host_bookings %}
-                    <li>
-                        {{ booking.post.title }} - Status: {{ booking.status }}
-                        <a href="{% url 'approve-booking' booking.id %}">Approve</a>
-                        <a href="{% url 'reject-booking' booking.id %}">Reject</a>
-                    </li>
+                    {% for booking in host_bookings_pending_approval %}
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            <a href="{% url 'approve-booking' booking.id %}">Approve</a>
+                            <a href="{% url 'reject-booking' booking.id %}">Reject</a>
+                        </li>
                     {% endfor %}
                 </ul>
-                <!-- Add buttons to approve or reject bookings -->
-            {% else %}
+            {% endif %}
+        
+            {% if host_bookings_approved %}
+                <h3>Host Bookings (Approved)</h3>
+                <ul>
+                    {% for booking in host_bookings_approved %}
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        
+            {% if not host_bookings_pending_approval and not host_bookings_approved %}
                 <p>No bookings as a host.</p>
             {% endif %}
         </div>
