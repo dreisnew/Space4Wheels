@@ -6,14 +6,14 @@ from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(default='default.jpg', upload_to='profile_pics')
+    image = models.ImageField(default='profile_pics/default.jpg', upload_to='profile_pics')
     contact_number = PhoneNumberField(blank=True, null=True) 
      
     def __str__(self):
         return f'{self.user.username} Profile'
     
-    def save(self):
-        super().save()
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
         
         img = Image.open(self.image.path)
         if img.height > 300 or img.width > 300:
