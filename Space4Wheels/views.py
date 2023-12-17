@@ -12,8 +12,11 @@ from .forms import BookingForm
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.generic.base import TemplateView
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 
+@login_required
 def book_space(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
 
@@ -34,8 +37,9 @@ def book_space(request, post_id):
             # Return a JSON response with form errors
             return JsonResponse({'success': False, 'errors': form.errors}, status=400)
     else:
-        form = BookingForm()
-
+        # Instantiate the form with initial values
+        form = BookingForm(instance=Booking(post=post, renter=request.user, host=post.author))
+        
     return render(request, 'Space4Wheels/bookings.html', {'form': form, 'post': post})
 
 def home(request):
@@ -95,13 +99,15 @@ class PostListView(ListView):
 
 class PostDetailView(DetailView):
     model = Post
-    template_name = 'Space4Wheels/post_detail.html'  # Update with your actual template name
+    template_name = 'Space4Wheels/post_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Set initial values for the non-editable fields
+
+        # Create an instance of the BookingForm and set initial values
         booking_form = BookingForm()
         booking_form.set_initial_values(self.object, self.request.user, self.object.author)
+
         context['booking_form'] = booking_form
         return context
     

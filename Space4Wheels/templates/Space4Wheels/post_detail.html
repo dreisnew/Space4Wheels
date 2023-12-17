@@ -109,7 +109,7 @@ document.getElementById('bookNowForm').addEventListener('submit', function (even
             console.error('Failed to create booking:', data.errors);
 
             // Display an error message to the user
-            alert('Failed to create booking. Please check the form for errors.');
+            alert('Failed to create booking. Please check the form for errors:\n' + JSON.stringify(data.errors));
         }
     })
     .catch(error => {
@@ -117,6 +117,6 @@ document.getElementById('bookNowForm').addEventListener('submit', function (even
         console.error('Error:', error);
     });
 });
-
 </script>
+
 {% endblock content %}
