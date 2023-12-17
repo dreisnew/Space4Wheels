@@ -31,11 +31,17 @@
                 <h3>Host Bookings (Pending Approval)</h3>
                 <ul>
                     {% for booking in host_bookings_pending_approval %}
-                        <li>
-                            {{ booking.post.title }} - Status: {{ booking.status }}
-                            <a href="{% url 'approve-booking' booking.id %}">Approve</a>
-                            <a href="{% url 'reject-booking' booking.id %}">Reject</a>
-                        </li>
+                    <li>
+                        {{ booking.post.title }} - Status: {{ booking.status }}
+                        <form method="post" action="{% url 'approve-booking' booking.id %}" class="button-container">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
+                        <form method="post" action="{% url 'reject-booking' booking.id %}" class="button-container">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                    </li>
                     {% endfor %}
                 </ul>
             {% endif %}
