@@ -8,7 +8,7 @@ from django.views.generic import (
     DeleteView
 )
 from Space4Wheels.models import Post, Booking
-from .forms import BookingForm
+from .forms import BookingForm, SearchForm
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.generic.base import TemplateView
@@ -153,7 +153,15 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 
 def search(request):
-    return render(request, 'Space4Wheels/search.html', {'title': 'Search'})
+    form = SearchForm(request.GET)
+    results = []
+
+    if form.is_valid():
+        query = form.cleaned_data['query']
+        # Modify the search logic to filter by title (case-insensitive)
+        results = Post.objects.filter(title__icontains=query)
+
+    return render(request, 'Space4Wheels/search.html', {'query': query, 'results': results})
 
 def host(request):
     # Instantiate the class-based view and get the queryset

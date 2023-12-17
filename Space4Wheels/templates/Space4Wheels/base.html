@@ -31,10 +31,14 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href="{% url 'Space4Wheels-home' %}">Home</a>
-              <a class="nav-item nav-link" href="{% url 'Space4Wheels-search' %}">Search</a>
               <a class="nav-item nav-link" href="{% url 'Space4Wheels-host' %}">Host</a>
               <a class="nav-item nav-link" href="{% url 'bookings' %}">Bookings</a>
               <a class="nav-item nav-link" href="{% url 'Space4Wheels-about' %}">About</a>
+              <form class="form-inline my-2 my-lg-0" method="get" action="{% url 'Space4Wheels-search' %}">
+                {% csrf_token %}
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name="query">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">

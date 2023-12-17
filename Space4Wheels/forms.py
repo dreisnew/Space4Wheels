@@ -22,7 +22,13 @@ class BookingForm(forms.ModelForm):
         self.fields['status'].disabled = True
 
     def set_initial_values(self, post, renter, host):
-        self.fields['reservation_start_date'].initial = self.instance.reservation_start_date if self.instance.reservation_start_date else None
-        self.fields['reservation_end_date'].initial = self.instance.reservation_end_date if self.instance.reservation_end_date else None
+        self.initial['post'] = post
+        self.initial['renter'] = renter
+        self.initial['host'] = host
+        self.initial['status'] = 'pending'
 
-        self.fields['status'].initial = 'pending'
+
+class SearchForm(forms.Form):
+    query = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Search'}))
+
+
