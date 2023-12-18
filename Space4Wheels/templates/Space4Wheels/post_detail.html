@@ -1,15 +1,129 @@
 {% extends "Space4Wheels/base.html" %}
+{% load crispy_forms_tags %}
+
 {% block content %}
     <article class="media content-section">
         <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
         <div class="media-body">
-        <div class="article-metadata">
-            <a class="mr-2" href="#">{{ object.author }}</a>
-            <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
-        </div>
-        <h2 class="article-title">{{ object.title }}</h2>
-        <p class="article-content">{{ object.content }}</p>
-        <!-- Add the other attributes/content to be displayed -->
+            <div class="article-metadata">
+                <a class="mr-2" href="#">{{ object.author }}</a>
+                <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+            </div>
+            <h2 class="article-title">{{ object.title }}</h2>
+            <p class="article-content">{{ object.content }}</p>
+            
+            <!-- Add the other attributes/content -->
+            <p><strong>Country:</strong> {{ object.country }}</p>
+            <p><strong>City:</strong> {{ object.city }}</p>
+            <p><strong>Address:</strong> {{ object.address }}</p>
+            <p><strong>Price:</strong> {{ object.price }}</p>
+            <p><strong>Price Rate:</strong> {{ object.get_price_rate_display }}</p>
+            <img src="{{ object.car_space_pics.url }}" alt="Car Space Pics" style="max-width: 300px;">
+            <p><strong>Car Space Type:</strong> {{ object.get_car_space_type_display }}</p>
+            <!-- Added the iframe map for google -->
+            <p><strong>Map Image:</strong>
+                <div>
+                    <iframe width="100%" height="600" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" 
+                    src="{{ object.map_image|safe }}">
+                    </iframe>
+                </div>
+            </p>
+            
+            {% if object.additional_notes %}
+                <p><strong>Additional Notes:</strong> {{ object.additional_notes }}</p>
+            {% endif %}
+            
+            <p><strong>Status:</strong> {{ object.status }}</p>
+            
+            <!-- Add more fields as needed -->
+            
+            {% if user.is_authenticated and user == object.author %}
+                <a href="{% url 'post-update' pk=object.pk %}" class="btn btn-secondary">Update</a>
+                <a href="{% url 'post-delete' pk=object.pk %}" class="btn btn-danger">Delete</a>
+            {% endif %}
+            
+            {% if user.is_authenticated and user != object.author %}
+            <button class="btn btn-primary" data-toggle="modal" data-target="#bookNowModal">Book Now</button>
+            {% endif %}
         </div>
     </article>
+
+    <!-- Booking Modal -->
+<div class="modal fade" id="bookNowModal" tabindex="-1" role="dialog" aria-labelledby="bookNowModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookNowModalLabel">Book Now</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" class="form" id="bookNowForm">
+                    {% csrf_token %}
+                    <!-- Manually format label and value for display -->
+                    <div class="form-group">
+                        <label>Renter:</label>
+                        {{ booking_form.initial.renter.username }}
+                    </div>
+                    <div class="form-group">
+                        <label>Host:</label>
+                        {{ booking_form.initial.host.username }}
+                    </div>
+                    <div class="form-group">
+                        <label>Post Title:</label>
+                        {{ booking_form.initial.post.title }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ booking_form.reservation_start_date.id_for_label }}">Reservation Start Date:</label>
+                        {{ booking_form.reservation_start_date }}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ booking_form.reservation_end_date.id_for_label }}">Reservation End Date:</label>
+                        {{ booking_form.reservation_end_date }}
+                    </div>
+                    <div class="form-group">
+                        <label>Status:</label>
+                        {{ booking_form.initial.status }}
+                    </div>
+                    <!-- Add other fields as needed -->
+                    <button type="submit" class="btn btn-primary">Submit Booking</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Handle form submission using AJAX
+document.getElementById('bookNowForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    // Perform an AJAX request to the book_space view
+    fetch('{% url "book-space" post_id=post.id %}', {
+        method: 'POST',
+        body: new FormData(event.target),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Display a success message
+            alert('Booking created successfully!');
+
+            // Reload the page to show the updated status
+            location.reload();
+        } else {
+            // Log the error details to the console
+            console.error('Failed to create booking:', data.errors);
+
+            // Display an error message to the user
+            alert('Failed to create booking. Please check the form for errors:\n' + JSON.stringify(data.errors));
+        }
+    })
+    .catch(error => {
+        // Handle fetch error if needed
+        console.error('Error:', error);
+    });
+});
+</script>
+
 {% endblock content %}
