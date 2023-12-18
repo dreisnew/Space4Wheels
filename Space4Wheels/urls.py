@@ -23,6 +23,4 @@ urlpatterns = [
     path('post/<int:post_id>/book_space/', book_space, name='book-space'),
     path('bookings/approve/<int:booking_id>/', views.approve_booking, name='approve-booking'),
     path('bookings/reject/<int:booking_id>/', views.reject_booking, name='reject-booking'),
-
-    #path('register/', user_views.register, name='register'),
 ]

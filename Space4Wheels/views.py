@@ -14,6 +14,7 @@ from django.http import JsonResponse
 from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.urls import reverse_lazy
 
 
 @login_required
@@ -122,6 +123,9 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.pk})
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
@@ -140,6 +144,10 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if self.request.user == post.author:
             return True
         return False
+    
+    def get_success_url(self):
+        post_id = self.kwargs['pk']  # Get the post ID from URL parameters
+        return reverse_lazy('post-detail', kwargs={'pk': post_id})
 
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
