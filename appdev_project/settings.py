@@ -137,3 +137,15 @@ CRISPY_TEMPLATE_PACK="bootstrap5"
 LOGIN_REDIRECT_URL = 'Space4Wheels-home'
 
 LOGIN_URL = 'login'
+
+# settings.py
+
+# ...
+
+# Celery Configuration
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'

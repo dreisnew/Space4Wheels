@@ -7,15 +7,15 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from Space4Wheels.models import Post, Booking
-from .forms import BookingForm, SearchForm
+from Space4Wheels.models import Post, Booking, Rating
+from .forms import BookingForm, SearchForm, RatingForm
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.urls import reverse_lazy
-from django.db.models import Q
+from django.db.models import Q, Avg
 
 @login_required
 def book_space(request, post_id):
@@ -135,11 +135,15 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        post_ratings = Rating.objects.filter(post=self.object)
+        average_rating = post_ratings.aggregate(Avg('rating'))['rating__avg']
+        
         # Create an instance of the BookingForm and set initial values
         booking_form = BookingForm()
         booking_form.set_initial_values(self.object, self.request.user, self.object.author)
 
         context['booking_form'] = booking_form
+        context['average_rating'] = average_rating
         return context
     
 class PostCreateView(LoginRequiredMixin, CreateView):
@@ -207,8 +211,48 @@ def host(request):
     user_listings_view = UserParkingSpaceListView()
     user_listings_view.request = request
     user_listings = user_listings_view.get_queryset()
-    
     return render(request, 'Space4Wheels/host.html', {'title': 'Host', 'user_listings': user_listings})
+
+def rate_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    booking = Booking.objects.filter(post=post, renter=request.user, status='done').first()
+
+    if not booking:
+        # Redirect or display an error message indicating that the user cannot rate the post.
+        return redirect('post-detail', pk=post_id)
+
+    if request.method == 'POST':
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            rating_value = form.cleaned_data['rating']
+
+            # Save the rating
+            rating = Rating.objects.create(user=request.user, post=post, rating=rating_value)
+
+            if rating:
+                print(f"Rating saved successfully: {rating}")
+            else:
+                print("Failed to save the rating")
+
+            # Update the average rating for the post
+            post_ratings = Rating.objects.filter(post=post)
+            average_rating = post_ratings.aggregate(Avg('rating'))['rating__avg']
+
+            # Update the post's average rating
+            post.rating = average_rating
+            post.save()
+
+            return redirect('post-detail', pk=post_id)
+    else:
+        form = RatingForm()
+
+    # Calculate average rating
+    post_ratings = Rating.objects.filter(post=post)
+    average_rating = post_ratings.aggregate(Avg('rating'))['rating__avg']
+
+    return render(request, 'Space4Wheels/rate_post.html', {'form': form, 'post': post, 'average_rating': average_rating})
+
+
 
 def bookings(request):
     return render(request, 'Space4Wheels/bookings.html', {'title': 'Bookings'})

@@ -6,7 +6,7 @@ from .views import (
     PostCreateView, 
     PostUpdateView,
     PostDeleteView,
-    book_space, BookingsView
+    book_space, BookingsView, rate_post
 )
 #from users import views as user_views
 
@@ -23,6 +23,6 @@ urlpatterns = [
     path('post/<int:post_id>/book_space/', book_space, name='book-space'),
     path('bookings/approve/<int:booking_id>/', views.approve_booking, name='approve-booking'),
     path('bookings/reject/<int:booking_id>/', views.reject_booking, name='reject-booking'),
-
+    path('rate-post/<int:post_id>/', rate_post, name='rate-post'),
     #path('register/', user_views.register, name='register'),
 ]

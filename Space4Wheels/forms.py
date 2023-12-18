@@ -32,3 +32,7 @@ class SearchForm(forms.Form):
     query = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Search'}))
 
 
+class RatingForm(forms.Form):
+    RATING_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
+
+    rating = forms.ChoiceField(choices=RATING_CHOICES, widget=forms.RadioSelect)

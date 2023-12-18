@@ -1,0 +1,10 @@
+{% extends "Space4Wheels/base.html" %}
+
+{% block content %}
+<h2>Rate this post</h2>
+<form method="post" action="{% url 'rate-post' post.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Rating</button>
+</form>
+{% endblock %}

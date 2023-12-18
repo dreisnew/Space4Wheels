@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 # Create your models here.
 class Post(models.Model):
@@ -39,7 +40,7 @@ class Post(models.Model):
     date_posted = models.DateTimeField(default=timezone.now)
     date_updated = models.DateTimeField(default=timezone.now)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    rating_rating = models.FloatField(default=0)
 
 class Booking(models.Model):
     STATUS_CHOICES = [
@@ -57,6 +58,7 @@ class Booking(models.Model):
     reservation_end_date = models.DateTimeField()
     date_requested = models.DateTimeField(default=timezone.now)
     pending_approval = models.BooleanField(default=True)
+
     
     def __str__(self):
         return f'{self.renter.username} - {self.post.title}'
@@ -64,4 +66,7 @@ class Booking(models.Model):
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
     
-    
+class Rating(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    rating = models.IntegerField()

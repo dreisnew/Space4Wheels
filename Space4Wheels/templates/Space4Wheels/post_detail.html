@@ -34,7 +34,8 @@
             {% endif %}
             
             <p><strong>Status:</strong> {{ object.status }}</p>
-            
+            <h3>Average Rating: {{ average_rating|default:"Not rated yet" }}</h3>
+
             <!-- Add more fields as needed -->
             
             {% if user.is_authenticated and user == object.author %}
