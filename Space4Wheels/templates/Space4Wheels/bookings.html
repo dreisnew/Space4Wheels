@@ -50,9 +50,9 @@
                 <h3>Host Bookings (Approved)</h3>
                 <ul>
                     {% for booking in host_bookings_approved %}
-                        <li>
-                            {{ booking.post.title }} - Status: {{ booking.status }}
-                        </li>
+                    <li>{{ booking.post.title }} - Status: {{ booking.status }}</li>
+                    {{booking.reservation_start_date}} to
+                    {{booking.reservation_end_date}}
                     {% endfor %}
                 </ul>
             {% endif %}

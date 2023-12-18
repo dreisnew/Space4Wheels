@@ -15,7 +15,7 @@ from django.views.generic.base import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.urls import reverse_lazy
-
+from django.db.models import Q
 
 @login_required
 def book_space(request, post_id):
@@ -24,11 +24,24 @@ def book_space(request, post_id):
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():
-            booking = form.save(commit=False)
-            booking.post = post
-            booking.renter = request.user
-            booking.host = post.author
-            booking.save()
+            new_booking = form.save(commit=False)
+            new_booking.post = post
+            new_booking.renter = request.user
+            new_booking.host = post.author
+
+            # Check for overlapping bookings
+            overlapping_bookings = Booking.objects.filter(
+                Q(reservation_start_date__lte=new_booking.reservation_end_date) &
+                Q(reservation_end_date__gte=new_booking.reservation_start_date) &
+                Q(status='approved')
+            )
+
+            if overlapping_bookings.exists():
+                # If there are overlapping bookings, return an error
+                errors = {'reservation_start_date': 'Dates are not available. Please choose different dates.'}
+                return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+            new_booking.save()
 
             # Add a success message
             messages.success(request, 'Booking created successfully.')
@@ -40,8 +53,9 @@ def book_space(request, post_id):
     else:
         # Instantiate the form with initial values
         form = BookingForm(instance=Booking(post=post, renter=request.user, host=post.author))
-        
+
     return render(request, 'Space4Wheels/bookings.html', {'form': form, 'post': post})
+
 
 def home(request):
     context = {
@@ -66,11 +80,27 @@ class BookingsView(LoginRequiredMixin, TemplateView):
     
 def approve_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
-    # Perform approval logic, e.g., set status to 'approved'
+
+    # Check for overlapping bookings with pending status
+    overlapping_bookings = Booking.objects.filter(
+        Q(reservation_start_date__range=(booking.reservation_start_date, booking.reservation_end_date)) |
+        Q(reservation_end_date__range=(booking.reservation_start_date, booking.reservation_end_date)),
+        post=booking.post,
+        status='pending'
+    )
+
+    # Approve the selected booking
     booking.status = 'approved'
     booking.pending_approval = False
     booking.save()
-    return redirect('bookings')  # Redirect to the bookings page
+
+    # Reject overlapping bookings
+    for overlapping_booking in overlapping_bookings:
+        overlapping_booking.status = 'rejected'
+        overlapping_booking.pending_approval = False
+        overlapping_booking.save()
+
+    return redirect('bookings')
 
 def reject_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
@@ -125,7 +155,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse('post-detail', kwargs={'pk': self.object.pk})
+        return reverse_lazy('post-detail', kwargs={'pk': self.object.pk})
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
