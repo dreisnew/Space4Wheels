@@ -1,21 +1,65 @@
+<!-- bookings.html -->
 {% extends "Space4Wheels/base.html" %}
 {% block content %}
     <h2>Bookings Page</h2>
-    <p>
-        This page will have two tabs. Host and Renter:
-    </p>
-    <h4>Renter</h4>
-    <ul>
-        <li>display 'no bookings' if there are none</li>
-        <li>all bookings you reserved (and have done)</li>
-        <li>status of the booking you made: pending, rejected, approved, done?(for when you finished your rental)</li>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" id="renter-tab" data-toggle="tab" href="#renter">Renter</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="host-tab" data-toggle="tab" href="#host">Host</a>
+        </li>
     </ul>
-    <h4>Host</h4>
-    <ul>
-        <li>display 'no bookings' if there are none</li>
-        <li>all bookings that a renter requested for reservation (just for the specific host)</li>
-        <li>Buttons to approve, or reject</li>
-    </ul>
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="renter">
+            {% if renter_bookings %}
+                <!-- Display renter bookings -->
+                <h3>Renter Bookings</h3>
+                <ul>
+                    {% for booking in renter_bookings %}
+                        <li>{{ booking.post.title }} - Status: {{ booking.status }}</li>
+                        {{booking.reservation_start_date}} to
+                        {{booking.reservation_end_date}}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No bookings as a renter.</p>
+            {% endif %}
+        </div>
+        <div class="tab-pane fade" id="host">
+            {% if host_bookings_pending_approval %}
+                <h3>Host Bookings (Pending Approval)</h3>
+                <ul>
+                    {% for booking in host_bookings_pending_approval %}
+                    <li>
+                        {{ booking.post.title }} - Status: {{ booking.status }}
+                        <form method="post" action="{% url 'approve-booking' booking.id %}" class="button-container">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
+                        <form method="post" action="{% url 'reject-booking' booking.id %}" class="button-container">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Reject</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        
+            {% if host_bookings_approved %}
+                <h3>Host Bookings (Approved)</h3>
+                <ul>
+                    {% for booking in host_bookings_approved %}
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        
+            {% if not host_bookings_pending_approval and not host_bookings_approved %}
+                <p>No bookings as a host.</p>
+            {% endif %}
+        </div>
+    </div>
 {% endblock content %}
-
-<!-- To be displayed here: All your listings, and a create new listing button -->

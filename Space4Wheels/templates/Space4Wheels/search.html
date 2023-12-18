@@ -1,9 +1,28 @@
 {% extends "Space4Wheels/base.html" %}
+
 {% block content %}
-    <h1>Search Page</h1>
-    <p>This page is for where users can search for possible rentals based on</p>
-    <ul>
-        <li>Date</li>
-        <li>location</li>
-    </ul>
+    <h2>Search Results for "{{ query }}"</h2>
+
+    {% if results %}
+        {% for post in results %}
+            <article class="media content-section">
+                <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
+                <div class="media-body">
+                    <div class="article-metadata">
+                        <a class="mr-2" href="#">{{ post.author }}</a>
+                        <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
+                    </div>
+                    <h2><a class="article-title" href="{% url 'post-detail' post.id %}">{{ post.title }}</a></h2>
+                    <p class="article-content">{{ post.content }}</p>
+                </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <p>No results found for "{{ query }}".</p>
+    {% endif %}
+
+    {# Pagination if needed #}
+    {% if is_paginated %}
+        {# Pagination code similar to your home.html #}
+    {% endif %}
 {% endblock content %}
