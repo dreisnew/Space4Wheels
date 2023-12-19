@@ -19,6 +19,7 @@
                     {% for booking in renter_bookings %}
                         <li>
                             {{ booking.post.title }} - Status: {{ booking.status }}
+                            <br />
                             {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
                         </li>
                     {% endfor %}
@@ -54,6 +55,12 @@
                     <li>{{ booking.post.title }} - Status: {{ booking.status }}</li>
                     {{booking.reservation_start_date}} to
                     {{booking.reservation_end_date}}
+                    <br />
+                    Request made by: {{ booking.renter.username }}
+                    <br />
+                    Email Address: {{ booking.renter.email }}
+                    <br />
+                    Contact Number: {{ booking.renter.profile.contact_number }}
                     {% endfor %}
                 </ul>
             {% endif %}
