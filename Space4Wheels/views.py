@@ -71,10 +71,15 @@ class BookingsView(LoginRequiredMixin, TemplateView):
         host_bookings_pending_approval = Booking.objects.filter(host=self.request.user, pending_approval=True)
         host_bookings_approved = Booking.objects.filter(host=self.request.user, pending_approval=False)
 
+        user_ratings = {}
+        for booking in renter_bookings:
+            user_ratings[booking.post_id] = booking.post.rating_set.filter(user=self.request.user).first()
+            
         context = {
             'renter_bookings': renter_bookings,
             'host_bookings_pending_approval': host_bookings_pending_approval,
             'host_bookings_approved': host_bookings_approved,
+            'user_ratings': user_ratings,
         }
         return context
     
@@ -135,15 +140,30 @@ class PostDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        post_ratings = Rating.objects.filter(post=self.object)
-        average_rating = post_ratings.aggregate(Avg('rating'))['rating__avg']
-        
         # Create an instance of the BookingForm and set initial values
         booking_form = BookingForm()
         booking_form.set_initial_values(self.object, self.request.user, self.object.author)
 
+        # Calculate the average rating for the post
+        post_ratings = Rating.objects.filter(post=self.object)
+        average_rating = post_ratings.aggregate(Avg('rating'))['rating__avg']
+
+        # Check if the user has already rated the post
+        user_rating = Rating.objects.filter(post=self.object, user=self.request.user).first()
+
         context['booking_form'] = booking_form
         context['average_rating'] = average_rating
+        context['user_rating'] = user_rating  # Pass the user's rating to the template
+        context['booking'] = None  # Add this line
+
+        if self.request.user.is_authenticated:
+            # Check if there is a booking with 'done' status
+            context['booking'] = Booking.objects.filter(
+                post=self.object,
+                renter=self.request.user,
+                status='done'
+            ).first()
+
         return context
     
 class PostCreateView(LoginRequiredMixin, CreateView):

@@ -17,13 +17,10 @@
                 <h3>Renter Bookings</h3>
                 <ul>
                     {% for booking in renter_bookings %}
-                        <li>{{ booking.post.title }} - Status: {{ booking.status }}
-                        {{booking.reservation_start_date}} to
-                        {{booking.reservation_end_date}}
-                        {% if booking.status == 'done' %}
-                                <a href="{% url 'rate-post' booking.post.id %}" class="btn btn-primary">Rate</a>
-                        {% endif %}
-                    </li>
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        </li>
                     {% endfor %}
                 </ul>
             {% else %}
