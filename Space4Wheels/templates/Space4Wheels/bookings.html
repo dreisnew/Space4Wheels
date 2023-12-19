@@ -61,6 +61,18 @@
                     Email Address: {{ booking.renter.email }}
                     <br />
                     Contact Number: {{ booking.renter.profile.contact_number }}
+                    {% if user.is_authenticated and user != object.author %}
+                        <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
+
+                        {% if booking and not user_rating.rating %}
+                            <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
+                            {% if booking.status == 'done' %}
+                                <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+
+
                     {% endfor %}
                 </ul>
             {% endif %}

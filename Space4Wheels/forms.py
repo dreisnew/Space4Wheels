@@ -36,3 +36,8 @@ class RatingForm(forms.Form):
     RATING_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
 
     rating = forms.ChoiceField(choices=RATING_CHOICES, widget=forms.RadioSelect)
+    
+class UserRatingForm(forms.Form):
+    RATING_CHOICES = [(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')]
+
+    rating = forms.ChoiceField(choices=RATING_CHOICES, widget=forms.RadioSelect)

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+
 # Create your models here.
 class Post(models.Model):
     PRICE_RATES = [
@@ -58,7 +59,7 @@ class Booking(models.Model):
     reservation_end_date = models.DateTimeField()
     date_requested = models.DateTimeField(default=timezone.now)
     pending_approval = models.BooleanField(default=True)
-
+    
     
     def __str__(self):
         return f'{self.renter.username} - {self.post.title}'
@@ -66,7 +67,13 @@ class Booking(models.Model):
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
     
-class Rating(models.Model):
+class Rating(models.Model): #rate booking
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    
+
+class UserRating(models.Model): #rate renter
+    rater = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings_given')
+    target_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ratings_received')
     rating = models.IntegerField()

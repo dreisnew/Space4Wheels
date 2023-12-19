@@ -7,8 +7,8 @@ from django.views.generic import (
     UpdateView,
     DeleteView
 )
-from Space4Wheels.models import Post, Booking, Rating
-from .forms import BookingForm, SearchForm, RatingForm
+from Space4Wheels.models import Post, Booking, Rating, UserRating
+from .forms import BookingForm, SearchForm, RatingForm, UserRatingForm
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.generic.base import TemplateView
@@ -257,8 +257,15 @@ def author_profile(request):
     author_username = request.GET.get('author_username', '')
     author = get_object_or_404(User, username=author_username)
 
+    # Fetch all ratings given to the author
+    author_ratings = UserRating.objects.filter(target_user=author)
+
+    # Calculate average rating
+    average_rating = author_ratings.aggregate(Avg('rating'))['rating__avg']
+
     context = {
         'author': author,
+        'average_rating': average_rating,
     }
 
     return render(request, 'Space4Wheels/author_profile.html', context)
@@ -310,7 +317,24 @@ def rate_post(request, post_id):
 
     return render(request, 'Space4Wheels/rate_post.html', {'form': form, 'post': post, 'average_rating': average_rating})
 
+def rate_user(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
 
+    if request.method == 'POST':
+        form = UserRatingForm(request.POST)
+        if form.is_valid():
+            rating_value = form.cleaned_data['rating']
+
+            # Save the rating
+            UserRating.objects.create(rater=request.user, target_user=booking.renter, rating=rating_value)
+
+            # Redirect or return a response as needed
+            return redirect('bookings')  # Redirect to the bookings page or any other page
+
+    else:
+        form = UserRatingForm()
+
+    return render(request, 'Space4Wheels/rate_user.html', {'form': form, 'booking': booking})
 
 def bookings(request):
     return render(request, 'Space4Wheels/bookings.html', {'title': 'Bookings'})

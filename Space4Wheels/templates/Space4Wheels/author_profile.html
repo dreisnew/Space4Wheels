@@ -8,6 +8,7 @@
             <p class="text-secondary">{{ author.email }}</p>
             <p class="text-secondary">Contact Number:</p>
             <p class="text-secondary">{{ author.profile.contact_number }}</p>
+            <p class="text-secondary">Average Rating: {{ average_rating|default:"Not rated yet" }}</p>
         </div>
     </div>
 </div>
