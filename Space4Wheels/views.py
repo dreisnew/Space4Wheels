@@ -131,8 +131,14 @@ class PostListView(ListView):
     model = Post
     template_name = 'Space4Wheels/home.html' # app>/<model>_<viewtype.html>
     context_object_name = 'posts'
-    ordering = ['-date_posted']
     paginate_by = 5
+    
+    def get_queryset(self):
+        # Filter the queryset to include only posts with status='available'
+        queryset = Post.objects.filter(status='available')
+        # Order the queryset by the 'date_posted' field in descending order (most recent first)
+        queryset = queryset.order_by('-date_posted')
+        return queryset
 
 class PostDetailView(DetailView):
     model = Post
