@@ -6,7 +6,7 @@ from .views import (
     PostCreateView, 
     PostUpdateView,
     PostDeleteView,
-    book_space, BookingsView, rate_post
+    book_space, BookingsView, rate_post, author_profile
 )
 #from users import views as user_views
 from django.contrib.auth.decorators import login_required
@@ -25,5 +25,5 @@ urlpatterns = [
     path('bookings/approve/<int:booking_id>/', views.approve_booking, name='approve-booking'),
     path('bookings/reject/<int:booking_id>/', views.reject_booking, name='reject-booking'),
     path('rate-post/<int:post_id>/', rate_post, name='rate-post'),
-    #path('register/', user_views.register, name='register'),
+    path('author-profile/', author_profile, name='author-profile'),
 ]

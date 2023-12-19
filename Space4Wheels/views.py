@@ -17,6 +17,7 @@ from django.utils import timezone
 from django.urls import reverse_lazy
 from django.db.models import Q, Avg
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.models import User
 
 @login_required
 def book_space(request, post_id):
@@ -139,6 +140,11 @@ class PostListView(ListView):
         # Order the queryset by the 'date_posted' field in descending order (most recent first)
         queryset = queryset.order_by('-date_posted')
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['author_username'] = self.request.GET.get('author_username', '')
+        return context
 
 class PostDetailView(DetailView):
     model = Post
@@ -246,6 +252,17 @@ def search(request):
         results = paginator.page(paginator.num_pages)
 
     return render(request, 'Space4Wheels/search.html', {'query': query, 'results': results})
+
+def author_profile(request):
+    author_username = request.GET.get('author_username', '')
+    author = get_object_or_404(User, username=author_username)
+
+    context = {
+        'author': author,
+    }
+
+    return render(request, 'Space4Wheels/author_profile.html', context)
+
 
 def host(request):
     # Instantiate the class-based view and get the queryset
