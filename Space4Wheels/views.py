@@ -16,6 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.urls import reverse_lazy
 from django.db.models import Q, Avg
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 @login_required
 def book_space(request, post_id):
@@ -216,13 +217,27 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 def search(request):
     form = SearchForm(request.GET)
+    query = request.GET.get('query', '')
     results = []
 
     if form.is_valid():
-        query = form.cleaned_data['query']
         # Modify the search logic to filter by title (case-insensitive)
-        results = Post.objects.filter(status='available') & (Post.objects.filter(title__icontains=query) | Post.objects.filter(city__icontains=query) | Post.objects.filter(country__icontains=query))
-        # just add more fields using or operator
+        results = Post.objects.filter(
+            Q(status='available') &
+            (Q(title__icontains=query) | Q(city__icontains=query) | Q(country__icontains=query))
+            # Add more fields using | (OR) operator and Q objects
+        )
+
+    # Pagination
+    paginator = Paginator(results, 5)
+    page = request.GET.get('page')
+
+    try:
+        results = paginator.page(page)
+    except PageNotAnInteger:
+        results = paginator.page(1)
+    except EmptyPage:
+        results = paginator.page(paginator.num_pages)
 
     return render(request, 'Space4Wheels/search.html', {'query': query, 'results': results})
 
