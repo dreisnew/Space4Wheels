@@ -74,12 +74,22 @@ class BookingsView(LoginRequiredMixin, TemplateView):
         host_bookings_approved = Booking.objects.filter(host=self.request.user, status='approved')
         host_bookings_done = Booking.objects.filter(host=self.request.user, status='done')
         host_bookings_rejected = Booking.objects.filter(host=self.request.user, status='rejected')
+        renter_bookings = Booking.objects.filter(renter=self.request.user)
+        renter_pending_bookings = renter_bookings.filter(status='pending')
+        renter_approved_bookings = renter_bookings.filter(status='approved')
+        renter_done_bookings = renter_bookings.filter(status='done')
+        renter_rejected_bookings = renter_bookings.filter(status='rejected')
+
 
         user_ratings = {}
         for booking in renter_bookings:
             user_ratings[booking.post_id] = booking.post.rating_set.filter(user=self.request.user).first()
 
         context = {
+            'renter_pending_bookings': renter_pending_bookings,
+            'renter_approved_bookings': renter_approved_bookings,
+            'renter_done_bookings': renter_done_bookings,
+            'renter_rejected_bookings': renter_rejected_bookings,
             'renter_bookings': renter_bookings,
             'host_bookings_pending_approval': host_bookings_pending_approval,
             'host_bookings_approved': host_bookings_approved,
