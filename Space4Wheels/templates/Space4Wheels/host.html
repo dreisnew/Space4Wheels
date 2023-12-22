@@ -14,7 +14,7 @@
                 <img class="rounded-circle article-img" src="{{ listing.author.profile.image.url }}">
                 <div class="media-body">
                     <div class="article-metadata">
-                        <a class="mr-2" href="#">{{ listing.author }}</a>
+                        <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ listing.author.username }}">{{ listing.author }}</a>
                         <small class="text-muted">{{ listing.date_posted|date:"F d, Y" }}</small>
                     </div>
                     <h2><a class="article-title" href="{% url 'post-detail' listing.id %}">{{ listing.title }}</a></h2>
