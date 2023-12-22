@@ -70,20 +70,25 @@ class BookingsView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         renter_bookings = Booking.objects.filter(renter=self.request.user)
-        host_bookings_pending_approval = Booking.objects.filter(host=self.request.user, pending_approval=True)
-        host_bookings_approved = Booking.objects.filter(host=self.request.user, pending_approval=False)
+        host_bookings_pending_approval = Booking.objects.filter(host=self.request.user, status='pending')
+        host_bookings_approved = Booking.objects.filter(host=self.request.user, status='approved')
+        host_bookings_done = Booking.objects.filter(host=self.request.user, status='done')
+        host_bookings_rejected = Booking.objects.filter(host=self.request.user, status='rejected')
 
         user_ratings = {}
         for booking in renter_bookings:
             user_ratings[booking.post_id] = booking.post.rating_set.filter(user=self.request.user).first()
-            
+
         context = {
             'renter_bookings': renter_bookings,
             'host_bookings_pending_approval': host_bookings_pending_approval,
             'host_bookings_approved': host_bookings_approved,
+            'host_bookings_done': host_bookings_done,
+            'host_bookings_rejected': host_bookings_rejected,
             'user_ratings': user_ratings,
         }
         return context
+
     
 def approve_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)

@@ -60,6 +60,12 @@ class Booking(models.Model):
     date_requested = models.DateTimeField(default=timezone.now)
     pending_approval = models.BooleanField(default=True)
     
+    def update_status(self):
+        now = timezone.now()
+        if self.status == 'approved' and now > self.reservation_end_date:
+            self.status = 'done'
+            self.pending_approval = False
+            self.save()
     
     def __str__(self):
         return f'{self.renter.username} - {self.post.title}'

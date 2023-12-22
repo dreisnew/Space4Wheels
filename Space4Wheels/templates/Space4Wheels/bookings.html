@@ -35,6 +35,11 @@
                     {% for booking in host_bookings_pending_approval %}
                     <li>
                         {{ booking.post.title }} - Status: {{ booking.status }}
+                        <br />
+                        {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        <br />
+                        Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                        <br />
                         <form method="post" action="{% url 'approve-booking' booking.id %}" class="button-container">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-success">Approve</button>
@@ -47,37 +52,77 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-        
+            
             {% if host_bookings_approved %}
                 <h3>Host Bookings (Approved)</h3>
                 <ul>
                     {% for booking in host_bookings_approved %}
-                    <li>{{ booking.post.title }} - Status: {{ booking.status }}</li>
-                    {{booking.reservation_start_date}} to
-                    {{booking.reservation_end_date}}
-                    <br />
-                    Request made by: {{ booking.renter.username }}
-                    <br />
-                    Email Address: {{ booking.renter.email }}
-                    <br />
-                    Contact Number: {{ booking.renter.profile.contact_number }}
-                    {% if user.is_authenticated and user != object.author %}
-                        <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
+                    <li>
+                        {{ booking.post.title }} - Status: {{ booking.status }}
+                        <br />
+                        {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        <br />
+                        Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                        <br />
+                        Email Address: {{ booking.renter.email }}
+                        <br />
+                        Contact Number: {{ booking.renter.profile.contact_number }}
+                        {% if user.is_authenticated and user != object.author %}
+                            <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
 
-                        {% if booking and not user_rating.rating %}
-                            <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
-                            {% if booking.status == 'done' %}
-                                <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
+                            {% if booking and not user_rating.rating %}
+                                <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
+                                {% if booking.status == 'done' %}
+                                    <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
+                                {% endif %}
                             {% endif %}
                         {% endif %}
-                    {% endif %}
-
-
+                    </li>
                     {% endfor %}
                 </ul>
             {% endif %}
-        
-            {% if not host_bookings_pending_approval and not host_bookings_approved %}
+            
+            {% if host_bookings_done %}
+                <h3>Host Bookings (Done)</h3>
+                <ul>
+                    {% for booking in host_bookings_done %}
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            <br />
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                            <br />
+                            Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                            {% if user.is_authenticated and user != object.author %}
+                                <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
+
+                                {% if booking and not user_rating.rating %}
+                                    <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
+                                    {% if booking.status == 'done' %}
+                                        <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% if host_bookings_rejected %}
+                <h3>Host Bookings (Rejected)</h3>
+                <ul>
+                    {% for booking in host_bookings_rejected %}
+                    <li>
+                        {{ booking.post.title }} - Status: {{ booking.status }}
+                        <br />
+                        {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        <br />
+                        Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% if not host_bookings_pending_approval and not host_bookings_approved and not host_bookings_pending and not host_bookings_rejected %}
                 <p>No bookings as a host.</p>
             {% endif %}
         </div>
