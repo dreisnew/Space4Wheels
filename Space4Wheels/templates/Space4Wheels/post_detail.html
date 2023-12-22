@@ -35,8 +35,16 @@
             
             <p><strong>Status:</strong> {{ object.status }}</p>
             <h3>Average Rating: {{ average_rating|default:"Not rated yet" }}</h3>
-
-            <!-- Add more fields as needed -->
+            {% if user.is_authenticated and user != object.author %}
+                <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
+                <!-- Display the rate button only if the user has not rated the post and the booking status is 'done' -->
+                {% if user_rating.rating is None and booking %}
+                    <a href="{% url 'rate-post' post.id %}" class="btn btn-primary">Rate</a>
+                {% else %}
+                    <!-- Debug information -->
+                    <p>Rate button conditions not met.</p>
+                {% endif %}
+            {% endif %}
             
             {% if user.is_authenticated and user == object.author %}
                 <a href="{% url 'post-update' pk=object.pk %}" class="btn btn-secondary">Update</a>

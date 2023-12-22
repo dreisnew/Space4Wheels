@@ -12,21 +12,69 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade show active" id="renter">
-            {% if renter_bookings %}
-                <!-- Display renter bookings -->
-                <h3>Renter Bookings</h3>
+            <!-- Display different sections for renter bookings based on status -->
+            {% if renter_pending_bookings %}
+                <h3>Renter Pending Bookings</h3>
+                <!-- Display pending bookings -->
                 <ul>
-                    {% for booking in renter_bookings %}
-                        <li>{{ booking.post.title }} - Status: {{ booking.status }}
-                        {{booking.reservation_start_date}} to
-                        {{booking.reservation_end_date}}
-                        {% if booking.status == 'done' %}
-                                <a href="{% url 'rate-post' booking.post.id %}" class="btn btn-primary">Rate</a>
-                        {% endif %}
-                    </li>
+                    {% for booking in renter_pending_bookings %}
+                        <!-- Display individual booking details -->
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            <br />
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        </li>
                     {% endfor %}
                 </ul>
-            {% else %}
+            {% endif %}
+            
+            {% if renter_approved_bookings %}
+                <h3>Renter Approved Bookings</h3>
+                <!-- Display approved bookings -->
+                <ul>
+                    {% for booking in renter_approved_bookings %}
+                        <!-- Display individual booking details -->
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            <br />
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if renter_done_bookings %}
+                <h3>Renter Done Bookings</h3>
+                <!-- Display done bookings -->
+                <ul>
+                    {% for booking in renter_done_bookings %}
+                        <!-- Display individual booking details -->
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            <br />
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                            
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if renter_rejected_bookings %}
+                <h3>Renter Rejected Bookings</h3>
+                <!-- Display rejected bookings -->
+                <ul>
+                    {% for booking in renter_rejected_bookings %}
+                        <!-- Display individual booking details -->
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            <br />
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if not renter_pending_bookings and not renter_approved_bookings and not renter_done_bookings and not renter_rejected_bookings %}
                 <p>No bookings as a renter.</p>
             {% endif %}
         </div>
@@ -37,6 +85,11 @@
                     {% for booking in host_bookings_pending_approval %}
                     <li>
                         {{ booking.post.title }} - Status: {{ booking.status }}
+                        <br />
+                        {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        <br />
+                        Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                        <br />
                         <form method="post" action="{% url 'approve-booking' booking.id %}" class="button-container">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-success">Approve</button>
@@ -49,21 +102,81 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-        
+            
             {% if host_bookings_approved %}
                 <h3>Host Bookings (Approved)</h3>
                 <ul>
                     {% for booking in host_bookings_approved %}
-                    <li>{{ booking.post.title }} - Status: {{ booking.status }}</li>
-                    {{booking.reservation_start_date}} to
-                    {{booking.reservation_end_date}}
+                    <li>
+                        {{ booking.post.title }} - Status: {{ booking.status }}
+                        <br />
+                        {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        <br />
+                        Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                        <br />
+                        Email Address: {{ booking.renter.email }}
+                        <br />
+                        Contact Number: {{ booking.renter.profile.contact_number }}
+                        {% if user.is_authenticated and user != object.author %}
+                            <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
+
+                            {% if booking and not user_rating.rating %}
+                                <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
+                                {% if booking.status == 'done' %}
+                                    <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    </li>
                     {% endfor %}
                 </ul>
             {% endif %}
-        
-            {% if not host_bookings_pending_approval and not host_bookings_approved %}
+            
+            {% if host_bookings_done %}
+                <h3>Host Bookings (Done)</h3>
+                <ul>
+                    {% for booking in host_bookings_done %}
+                        <li>
+                            {{ booking.post.title }} - Status: {{ booking.status }}
+                            <br />
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                            <br />
+                            Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                            {% if user.is_authenticated and user != object.author %}
+                                <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
+
+                                {% if booking and not user_rating.rating %}
+                                    <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
+                                    {% if booking.status == 'done' %}
+                                        <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% if host_bookings_rejected %}
+                <h3>Host Bookings (Rejected)</h3>
+                <ul>
+                    {% for booking in host_bookings_rejected %}
+                    <li>
+                        {{ booking.post.title }} - Status: {{ booking.status }}
+                        <br />
+                        {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                        <br />
+                        Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% if not host_bookings_pending_approval and not host_bookings_approved and not host_bookings_pending and not host_bookings_rejected %}
                 <p>No bookings as a host.</p>
             {% endif %}
         </div>
     </div>
+
+    
 {% endblock content %}

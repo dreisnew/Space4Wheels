@@ -1,8 +1,6 @@
 {% extends "Space4Wheels/base.html" %}
-
 {% block content %}
     <h2>Search Results for "{{ query }}"</h2>
-
     {% if results %}
         {% for post in results %}
             <article class="media content-section">
@@ -21,8 +19,30 @@
         <p>No results found for "{{ query }}".</p>
     {% endif %}
 
-    {# Pagination if needed #}
-    {% if is_paginated %}
-        {# Pagination code similar to your home.html #}
-    {% endif %}
+    {% if results.has_other_pages %}
+    <div class="pagination">
+        <span class="step-links">
+            {% if results.has_previous %}
+                <a class="btn btn-outline-info mb-4" href="?query={{ query }}&page=1">First</a>
+                <a class="btn btn-outline-info mb-4" href="?query={{ query }}&page={{ results.previous_page_number }}">Previous</a>
+            {% endif %}
+
+            {% for num in results.paginator.page_range %}
+                {% if results.number == num %}
+                    <span class="current">
+                        <a class="btn btn-info mb-4" href="?query={{ query }}&page={{ num }}">{{ num }}</a>
+                    </span>
+                {% elif num > results.number|add:'-3' and num < results.number|add:'3' %}
+                    <a class="btn btn-outline-info mb-4" href="?query={{ query }}&page={{ num }}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if results.has_next %}
+                <a class="btn btn-outline-info mb-4" href="?query={{ query }}&page={{ results.next_page_number }}">Next</a>
+                <a class="btn btn-outline-info mb-4" href="?query={{ query }}&page={{ results.paginator.num_pages }}">Last</a>
+            {% endif %}
+        </span>
+    </div>
+{% endif %}
+
 {% endblock content %}
