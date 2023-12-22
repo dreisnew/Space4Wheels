@@ -31,15 +31,16 @@ def book_space(request, post_id):
             new_booking.renter = request.user
             new_booking.host = post.author
 
-            # Check for overlapping bookings
+            # Check for overlapping bookings for the specific post
             overlapping_bookings = Booking.objects.filter(
+                Q(post=post) &
                 Q(reservation_start_date__lte=new_booking.reservation_end_date) &
                 Q(reservation_end_date__gte=new_booking.reservation_start_date) &
                 Q(status='approved')
             )
 
             if overlapping_bookings.exists():
-                # If there are overlapping bookings, return an error
+                # If there are overlapping bookings for the specific post, return an error
                 errors = {'reservation_start_date': 'Dates are not available. Please choose different dates.'}
                 return JsonResponse({'success': False, 'errors': errors}, status=400)
 
@@ -57,6 +58,7 @@ def book_space(request, post_id):
         form = BookingForm(instance=Booking(post=post, renter=request.user, host=post.author))
 
     return render(request, 'Space4Wheels/bookings.html', {'form': form, 'post': post})
+
 
 
 def home(request):
@@ -83,7 +85,7 @@ class BookingsView(LoginRequiredMixin, TemplateView):
 
         user_ratings = {}
         for booking in renter_bookings:
-            user_ratings[booking.post_id] = booking.post.rating_set.filter(user=self.request.user).first()
+            user_ratings[booking.post.id] = booking.post.rating_set.filter(user=self.request.user).first()
 
         context = {
             'renter_pending_bookings': renter_pending_bookings,
@@ -332,6 +334,7 @@ def rate_post(request, post_id):
 
     return render(request, 'Space4Wheels/rate_post.html', {'form': form, 'post': post, 'average_rating': average_rating})
 
+@login_required
 def rate_user(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id)
 
@@ -340,8 +343,15 @@ def rate_user(request, booking_id):
         if form.is_valid():
             rating_value = form.cleaned_data['rating']
 
+            print(f'Rater: {request.user}, Target User: {booking.renter}, Rating: {rating_value}')
+            
             # Save the rating
-            UserRating.objects.create(rater=request.user, target_user=booking.renter, rating=rating_value)
+            user_rating = UserRating.objects.create(rater=request.user, target_user=booking.renter, rating=rating_value)
+
+            if user_rating:
+                print(f"User rating saved successfully: {user_rating}")
+            else:
+                print("Failed to save user rating")
 
             # Redirect or return a response as needed
             return redirect('bookings')  # Redirect to the bookings page or any other page
@@ -350,6 +360,7 @@ def rate_user(request, booking_id):
         form = UserRatingForm()
 
     return render(request, 'Space4Wheels/rate_user.html', {'form': form, 'booking': booking})
+
 
 def bookings(request):
     return render(request, 'Space4Wheels/bookings.html', {'title': 'Bookings'})
