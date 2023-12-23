@@ -1,5 +1,6 @@
 # Space4Wheels
- appdev project
+
+appdev project
 
 ### **Introduction**
 
@@ -34,3 +35,4 @@ Access the application via http://localhost:8000 in your web browser.
 
 - Andrea Chiang [@dreisnew](https://github.com/dreisnew)
 - Lara Jakosalem [@larajako](https://github.com/larajako)
+
