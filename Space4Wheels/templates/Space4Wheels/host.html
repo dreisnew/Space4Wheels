@@ -8,19 +8,24 @@
         <a href="{% url 'post-create' %}" class="btn btn-primary">Create New Listing</a>
     </div>
 </div>
-    <ul>
-        {% for listing in user_listings %}
-            <article class="media content-section">
-                <img class="rounded-circle article-img" src="{{ listing.author.profile.image.url }}">
-                <div class="media-body">
-                    <div class="article-metadata">
-                        <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ listing.author.username }}">{{ listing.author }}</a>
-                        <small class="text-muted">{{ listing.date_posted|date:"F d, Y" }}</small>
+    {% if not user_listings %}
+        <p>No listings created yet.</p>
+    {% else %}
+        <ul>
+            {% for listing in user_listings %}
+                <article class="media content-section">
+                    <img class="rounded-circle article-img" src="{{ listing.author.profile.image.url }}">
+                    <div class="media-body">
+                        <div class="article-metadata">
+                            <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ listing.author.username }}">{{ listing.author }}</a>
+                            <small class="text-muted">{{ listing.date_posted|date:"F d, Y" }}</small>
+                        </div>
+                        <h2><a class="article-title" href="{% url 'post-detail' listing.id %}">{{ listing.title }}</a></h2>
+                        <p class="article-content">{{ listing.content }}</p>
                     </div>
-                    <h2><a class="article-title" href="{% url 'post-detail' listing.id %}">{{ listing.title }}</a></h2>
-                    <p class="article-content">{{ listing.content }}</p>
-                </div>
-            </article>
-        {% endfor %}
-    </ul>
+                </article>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
 {% endblock content %}
