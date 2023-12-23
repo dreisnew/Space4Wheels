@@ -1,4 +1,3 @@
-<!-- bookings.html -->
 {% extends "Space4Wheels/base.html" %}
 {% block content %}
     <h2>Bookings Page</h2>
@@ -14,62 +13,89 @@
         <div class="tab-pane fade show active" id="renter">
             <!-- Display different sections for renter bookings based on status -->
             {% if renter_pending_bookings %}
-                <h3>Renter Pending Bookings</h3>
+                <h3 class="text-primary">Renter Pending Bookings</h3>
                 <!-- Display pending bookings -->
                 <ul>
                     {% for booking in renter_pending_bookings %}
                         <!-- Display individual booking details -->
-                        <li>
-                            {{ booking.post.title }} - Status: {{ booking.status }}
-                            <br />
-                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
-                        </li>
+                        <article class="media content-section">
+                            <div class="media-body">
+                                <h5>{{ booking.post.title }}</h5>
+                                Status: {{ booking.status }}
+                                <br />
+                                Duration: {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                                <br />
+                                Host: <a href="{% url 'author-profile' %}?author_username={{ booking.host.username }}">{{ booking.host.username }}</a>
+                                <br />
+                                Request made on: {{ booking.date_requested }}
+                            </div>
+                        </article>
                     {% endfor %}
                 </ul>
             {% endif %}
             
             {% if renter_approved_bookings %}
-                <h3>Renter Approved Bookings</h3>
+                <h3 class="text-success">Renter Approved Bookings</h3>
                 <!-- Display approved bookings -->
                 <ul>
                     {% for booking in renter_approved_bookings %}
                         <!-- Display individual booking details -->
-                        <li>
-                            {{ booking.post.title }} - Status: {{ booking.status }}
-                            <br />
-                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
-                        </li>
+                        <article class="media content-section">
+                            <div class="media-body">
+                                <h5>{{ booking.post.title }}</h5>
+                                Status: {{ booking.status }}
+                                <br />
+                                Duration: {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                                <br />
+                                Host: <a href="{% url 'author-profile' %}?author_username={{ booking.host.username }}">{{ booking.host.username }}</a>
+                                <br />
+                                Request made on: {{ booking.date_requested }}
+                            </div>
+                        </article>
                     {% endfor %}
                 </ul>
             {% endif %}
 
             {% if renter_done_bookings %}
-                <h3>Renter Done Bookings</h3>
+                <h3 class="text-danger">Renter Done Bookings</h3>
                 <!-- Display done bookings -->
                 <ul>
                     {% for booking in renter_done_bookings %}
                         <!-- Display individual booking details -->
-                        <li>
-                            {{ booking.post.title }} - Status: {{ booking.status }}
-                            <br />
-                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
-                            
-                        </li>
+                        <article class="media content-section">
+                            <div class="media-body">
+                                <h5>{{ booking.post.title }}</h5>
+                                Status: {{ booking.status }}
+                                <br />
+                                Duration: {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                                <br />
+                                Host: <a href="{% url 'author-profile' %}?author_username={{ booking.host.username }}">{{ booking.host.username }}</a>
+                                <br />
+                                Request made on: {{ booking.date_requested }}
+                            </div>
+                        </article>
                     {% endfor %}
                 </ul>
             {% endif %}
 
             {% if renter_rejected_bookings %}
-                <h3>Renter Rejected Bookings</h3>
+                <h3 class="text-warning">Renter Rejected Bookings</h3>
                 <!-- Display rejected bookings -->
                 <ul>
                     {% for booking in renter_rejected_bookings %}
                         <!-- Display individual booking details -->
-                        <li>
-                            {{ booking.post.title }} - Status: {{ booking.status }}
-                            <br />
-                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
-                        </li>
+                        <article class="media content-section">
+                            <div class="media-body">
+                                <h5>{{ booking.post.title }}</h5>
+                                Status: {{ booking.status }}
+                                <br />
+                                Duration: {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                                <br />
+                                Host: <a href="{% url 'author-profile' %}?author_username={{ booking.host.username }}">{{ booking.host.username }}</a>
+                                <br />
+                                Request made on: {{ booking.date_requested }}
+                            </div>
+                        </article>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -80,15 +106,23 @@
         </div>
         <div class="tab-pane fade" id="host">
             {% if host_bookings_pending_approval %}
-                <h3>Host Bookings (Pending Approval)</h3>
+                <h3 class="text-primary">Host Bookings (Pending Approval)</h3>
                 <ul>
                     {% for booking in host_bookings_pending_approval %}
-                    <li>
-                        {{ booking.post.title }} - Status: {{ booking.status }}
+                    <article class="media content-section">
+                        <div class="media-body">
+                        <h5>{{ booking.post.title }}</h5>
+                        Status: {{ booking.status }}
                         <br />
                         {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
                         <br />
                         Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                        <br />
+                        Email Address: {{ booking.renter.email }}
+                        <br />
+                        Contact Number: {{ booking.renter.profile.contact_number }}
+                        <br />
+                        Request made on: {{ booking.date_requested }}
                         <br />
                         <form method="post" action="{% url 'approve-booking' booking.id %}" class="button-container">
                             {% csrf_token %}
@@ -98,50 +132,30 @@
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger">Reject</button>
                         </form>
-                    </li>
+                        </div>
+                    </article>
                     {% endfor %}
                 </ul>
             {% endif %}
             
             {% if host_bookings_approved %}
-                <h3>Host Bookings (Approved)</h3>
+                <h3 class="text-success">Host Bookings (Approved)</h3>
                 <ul>
                     {% for booking in host_bookings_approved %}
-                    <li>
-                        {{ booking.post.title }} - Status: {{ booking.status }}
-                        <br />
-                        {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
-                        <br />
-                        Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
-                        <br />
-                        Email Address: {{ booking.renter.email }}
-                        <br />
-                        Contact Number: {{ booking.renter.profile.contact_number }}
-                        {% if user.is_authenticated and user != object.author %}
-                            <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
-
-                            {% if booking and not user_rating.rating %}
-                                <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
-                                {% if booking.status == 'done' %}
-                                    <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
-                                {% endif %}
-                            {% endif %}
-                        {% endif %}
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-            
-            {% if host_bookings_done %}
-                <h3>Host Bookings (Done)</h3>
-                <ul>
-                    {% for booking in host_bookings_done %}
-                        <li>
-                            {{ booking.post.title }} - Status: {{ booking.status }}
+                    <article class="media content-section">
+                        <div class="media-body">
+                            <h5>{{ booking.post.title }}</h5>
+                            Status: {{ booking.status }}
                             <br />
                             {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
                             <br />
                             Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                            <br />
+                            Email Address: {{ booking.renter.email }}
+                            <br />
+                            Contact Number: {{ booking.renter.profile.contact_number }}
+                            <br />
+                            Request made on: {{ booking.date_requested }}
                             {% if user.is_authenticated and user != object.author %}
                                 <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
 
@@ -152,22 +166,58 @@
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
-                        </li>
+                        </div>
+                    </article>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            
+            {% if host_bookings_done %}
+                <h3 class="text-danger">Host Bookings (Done)</h3>
+                <ul>
+                    {% for booking in host_bookings_done %}
+                    <article class="media content-section">
+                        <div class="media-body">
+                            <h5>{{ booking.post.title }}</h5>
+                            Status: {{ booking.status }}
+                            <br />
+                            {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
+                            <br />
+                            Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
+                            <br />
+                            Request made on: {{ booking.date_requested }}
+                            {% if user.is_authenticated and user != object.author %}
+                                <p>User Rating: {{ user_rating.rating|default:"None" }}</p>
+
+                                {% if booking and not user_rating.rating %}
+                                    <!-- Display the rate button only if the booking status is 'done' and the user has not rated -->
+                                    {% if booking.status == 'done' %}
+                                        <a href="{% url 'rate_user' booking.id %}" class="btn btn-primary">Rate User</a>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </article>
                     {% endfor %}
                 </ul>
             {% endif %}
             
             {% if host_bookings_rejected %}
-                <h3>Host Bookings (Rejected)</h3>
+                <h3 class="text-warning">Host Bookings (Rejected)</h3>
                 <ul>
                     {% for booking in host_bookings_rejected %}
-                    <li>
-                        {{ booking.post.title }} - Status: {{ booking.status }}
+                    <article class="media content-section">
+                        <div class="media-body">
+                        <h5>{{ booking.post.title }}</h5>
+                        Status: {{ booking.status }}
                         <br />
                         {{ booking.reservation_start_date }} to {{ booking.reservation_end_date }}
                         <br />
                         Request by: <a href="{% url 'author-profile' %}?author_username={{ booking.renter.username }}">{{ booking.renter.username }}</a>
-                    </li>
+                        <br />
+                        Request made on: {{ booking.date_requested }}
+                        </div>
+                    </article>
                     {% endfor %}
                 </ul>
             {% endif %}

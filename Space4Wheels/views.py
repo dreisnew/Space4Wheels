@@ -71,16 +71,16 @@ class BookingsView(LoginRequiredMixin, TemplateView):
     template_name = 'Space4Wheels/bookings.html'
 
     def get_context_data(self, **kwargs):
-        renter_bookings = Booking.objects.filter(renter=self.request.user)
-        host_bookings_pending_approval = Booking.objects.filter(host=self.request.user, status='pending')
-        host_bookings_approved = Booking.objects.filter(host=self.request.user, status='approved')
-        host_bookings_done = Booking.objects.filter(host=self.request.user, status='done')
-        host_bookings_rejected = Booking.objects.filter(host=self.request.user, status='rejected')
-        renter_bookings = Booking.objects.filter(renter=self.request.user)
-        renter_pending_bookings = renter_bookings.filter(status='pending')
-        renter_approved_bookings = renter_bookings.filter(status='approved')
-        renter_done_bookings = renter_bookings.filter(status='done')
-        renter_rejected_bookings = renter_bookings.filter(status='rejected')
+        renter_bookings = Booking.objects.filter(renter=self.request.user).order_by('-date_requested')
+        host_bookings_pending_approval = Booking.objects.filter(host=self.request.user, status='pending').order_by('-date_requested')
+        host_bookings_approved = Booking.objects.filter(host=self.request.user, status='approved').order_by('-date_requested')
+        host_bookings_done = Booking.objects.filter(host=self.request.user, status='done').order_by('-date_requested')
+        host_bookings_rejected = Booking.objects.filter(host=self.request.user, status='rejected').order_by('-date_requested')
+        renter_bookings = Booking.objects.filter(renter=self.request.user).order_by('-date_requested')
+        renter_pending_bookings = renter_bookings.filter(status='pending').order_by('-date_requested')
+        renter_approved_bookings = renter_bookings.filter(status='approved').order_by('-date_requested')
+        renter_done_bookings = renter_bookings.filter(status='done').order_by('-date_requested')
+        renter_rejected_bookings = renter_bookings.filter(status='rejected').order_by('-date_requested')
 
 
         user_ratings = {}
@@ -250,12 +250,21 @@ def search(request):
     results = []
 
     if form.is_valid():
-        # Modify the search logic to filter by title (case-insensitive)
-        results = Post.objects.filter(
-            Q(status='available') &
-            (Q(title__icontains=query) | Q(city__icontains=query) | Q(country__icontains=query))
-            # Add more fields using | (OR) operator and Q objects
-        )
+        # Split the query into individual keywords
+        keywords = query.split()  # Split by space, you can use any separator if needed
+
+        # Start with all posts that are available
+        results = Post.objects.filter(status='available')
+
+        # Search each keyword in title, city, and country fields (case-insensitive)
+        for keyword in keywords:
+            results = results.filter(
+                Q(title__icontains=keyword) |
+                Q(city__icontains=keyword) |
+                Q(country__icontains=keyword) |
+                Q(address__icontains=keyword) |
+                Q(car_space_type__icontains=keyword) 
+            ).distinct()
 
     # Pagination
     paginator = Paginator(results, 5)

@@ -6,7 +6,14 @@
         <img class="rounded-circle article-img" src="{{ object.author.profile.image.url }}">
         <div class="media-body">
             <div class="article-metadata">
-                <a class="mr-2" href="#">{{ object.author }}</a>
+                <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ post.author.username }}">{{ object.author }}</a>
+                <!--
+                    {% if user == post.author %}
+                        <a class="mr-2" href="{% url 'profile' %}">{{ object.author }}</a>
+                    {% else %}
+                        <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ post.author.username }}">{{ object.author }}</a>
+                    {% endif %}
+                -->
                 <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
             </div>
             <h2 class="article-title">{{ object.title }}</h2>

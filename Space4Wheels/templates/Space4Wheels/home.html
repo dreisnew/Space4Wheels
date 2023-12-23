@@ -5,6 +5,14 @@
           <img class="rounded-circle article-img" src="{{ post.author.profile.image.url }}">
           <div class="media-body">
             <div class="article-metadata">
+              <!--
+                <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ post.author.username }}">{{ post.author }}</a>
+                {% if user == post.author %}
+                  <a class="mr-2" href="{% url 'profile' %}">{{ post.author }}</a>
+                {% else %}
+                  <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ post.author.username }}">{{ post.author }}</a>
+                {% endif %}
+              -->
               <a class="mr-2" href="{% url 'author-profile' %}?author_username={{ post.author.username }}">{{ post.author }}</a>
               <small class="text-muted">{{ post.date_posted|date:"F d, Y" }}</small>
             </div>
